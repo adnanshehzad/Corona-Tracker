@@ -1,6 +1,7 @@
 package com.io.miu.CoronaTracker.Services.impl;
 
 import com.io.miu.CoronaTracker.Models.CoronaData;
+import com.io.miu.CoronaTracker.Models.CoronaDataBuilder;
 import com.io.miu.CoronaTracker.Services.CoronaVirusService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -19,7 +20,7 @@ import java.util.List;
 @Service
 public class CoronaVirusServiceImpl  implements CoronaVirusService {
     private List<CoronaData> allstats=new ArrayList<>();
-    private String coronadataurl_confirmed="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
+    private String coronadataurl_confirmed="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv";
     private Iterable<CSVRecord> records;
 
     public void getdataonServerStart() throws IOException, InterruptedException{
@@ -30,22 +31,21 @@ public class CoronaVirusServiceImpl  implements CoronaVirusService {
         StringReader stringReader = new StringReader(httpResponse.body());
         records = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(stringReader);
     }
-    public int checkLatestCases( CSVRecord record){
-        int totalcases=0;
-        String check=record.get(record.size()-1);
-        if (!(check.isEmpty() || check==null))
-            totalcases=Integer.parseInt(record.get(record.size()-1));
-        return totalcases;
-    }
+//    public int checkLatestCases( CSVRecord record){
+//        int totalcases=0;
+//        String check=record.get(record.size()-1);
+//        if (!(check.isEmpty() || check==null))
+//            totalcases=Integer.parseInt(record.get(record.size()-1));
+//        return totalcases;
+//    }
     public List<CoronaData> fetchdata() throws IOException, InterruptedException {
             getdataonServerStart();
             List<CoronaData> coronaDatanewList=new ArrayList<CoronaData>();
             for (CSVRecord record : records) {
-                CoronaData coronaData=new CoronaData();
-                coronaData.setState(record.get("Province/State"));
-                coronaData.setCountry(record.get("Country/Region"));
-                coronaData.setLatestTotalCases(checkLatestCases(record));
-                coronaDatanewList.add(coronaData);
+                //Applying builder pattern
+                coronaDatanewList.add(new CoronaDataBuilder().setState(record.get("Province/State"))
+                        .setCountry(record.get("Country/Region"))
+                        .setLatestTotalCases(Integer.parseInt(record.get(record.size()-1))).buildCoronaData());
             }
             this.allstats=coronaDatanewList;
             return (this.allstats);
@@ -57,9 +57,11 @@ public class CoronaVirusServiceImpl  implements CoronaVirusService {
             for(CSVRecord record:records){
                 String region=record.get("Country/Region");
                 if (region.equalsIgnoreCase(country)){
-                    data.setCountry(record.get("Country/Region"));
-                    data.setState(record.get("Province/State"));
-                    data.setLatestTotalCases(checkLatestCases(record));
+                    //Applying Builder Pattern
+                    data=new CoronaDataBuilder().setCountry(record.get("Country/Region"))
+                            .setState(record.get("Province/State"))
+                            .setLatestTotalCases(Integer.parseInt(record.get(record.size()-1)))
+                            .buildCoronaData();
                 }
             }
             return data;
