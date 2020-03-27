@@ -7,10 +7,8 @@ public class CoronaData {
     private String state;
     private String Country;
     private int latestTotalCases;
-    public int getLatestTotalCases() {
-        return latestTotalCases;
-    }
-
+    private double Lat;
+    private double Long;
     public void setLatestTotalCases(int latestTotalCases) {
         this.latestTotalCases = latestTotalCases;
     }

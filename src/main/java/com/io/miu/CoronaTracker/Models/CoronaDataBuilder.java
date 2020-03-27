@@ -4,6 +4,8 @@ public class CoronaDataBuilder {
     private String state;
     private String Country;
     private int latestTotalCases;
+    private double Lat;
+    private double Longi;
 
     public CoronaDataBuilder setState(String state) {
         this.state = state;
@@ -19,8 +21,16 @@ public class CoronaDataBuilder {
         this.latestTotalCases = latestTotalCases;
         return this;
     }
+    public CoronaDataBuilder setLatitude(double lat){
+        this.Lat=lat;
+        return this;
+    }
+    public CoronaDataBuilder setLongitude(double lon){
+        this.Longi=lon;
+        return this;
+    }
 
     public CoronaData buildCoronaData(){
-        return new CoronaData(state,Country,latestTotalCases);
+        return new CoronaData(state,Country,latestTotalCases,Lat,Longi);
     }
 }
