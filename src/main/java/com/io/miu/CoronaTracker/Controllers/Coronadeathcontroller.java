@@ -1,12 +1,14 @@
 package com.io.miu.CoronaTracker.Controllers;
 
 import com.io.miu.CoronaTracker.Models.CoronaData;
-import com.io.miu.CoronaTracker.Services.impl.CoronaVirusServiceImpl;
+import com.io.miu.CoronaTracker.Services.impl.CoronaconfirmedServiceImpl;
+import com.io.miu.CoronaTracker.Services.impl.CoronadeathServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -14,21 +16,22 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-public class Coronacontroller {
+@RequestMapping("/api/v1/deaths")
+public class Coronadeathcontroller {
     @Autowired
-    CoronaVirusServiceImpl coronaVirusService;
+    CoronadeathServiceImpl coronadeathService;
 
     @GetMapping("/")
     public ResponseEntity<?> getAllData() throws IOException, InterruptedException {
-        List<CoronaData> resultData=coronaVirusService.fetchdata();
+        List<CoronaData> resultData=coronadeathService.fetchcasesdata();
         if (!resultData.isEmpty()){
-            return new ResponseEntity<>(resultData,HttpStatus.OK);
+            return new ResponseEntity<>(resultData, HttpStatus.OK);
         }
         return new ResponseEntity<String>("No data found",HttpStatus.BAD_REQUEST);
     }
     @GetMapping(value = "/{country}")
     public ResponseEntity<?> getByCountry(@PathVariable("country") String country) throws IOException, InterruptedException {
-        CoronaData countrydata=coronaVirusService.getByCountry(country);
+        CoronaData countrydata=coronadeathService.getcasesByCountry(country);
         if (countrydata!=null){
             return new ResponseEntity<CoronaData>(countrydata,HttpStatus.OK);
         }
@@ -38,4 +41,5 @@ public class Coronacontroller {
             return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
         }
     }
+
 }
